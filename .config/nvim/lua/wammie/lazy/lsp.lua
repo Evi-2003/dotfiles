@@ -92,5 +92,9 @@ return {
         }
       })
     end
-  }
+  },
+{
+  'stevearc/conform.nvim',
+  opts = {},
+}
 }
