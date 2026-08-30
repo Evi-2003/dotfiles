@@ -17,3 +17,4 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 require("wammie.lazy_init")
 require("wammie.set")
+require("wammie.keymaps")
