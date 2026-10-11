@@ -35,10 +35,36 @@ return {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
     },
+    opts = function(_, opts)
+      local keys = opts.servers["*"].keys or {}
+      opts.servers["*"].keys = vim.tbl_filter(function(key)
+        return key[1] ~= "gd"
+      end, keys)
+      table.insert(opts.servers["*"].keys, {
+        "gd",
+        function()
+          vim.lsp.buf.definition({ reuse_win = true })
+        end,
+        desc = "Go to definition",
+        has = "definition",
+      })
+      return opts
+    end,
     init = function()
       -- Reserve a space in the gutter
       -- This will avoid an annoying layout shift in the screen
       vim.opt.signcolumn = "yes"
+
+      vim.diagnostic.config({
+        virtual_text = {
+          spacing = 2,
+          source = "if_many",
+        },
+        signs = true,
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+      })
     end,
     config = function()
       local lsp_defaults = require("lspconfig").util.default_config
@@ -59,7 +85,6 @@ return {
           local opts = { buffer = event.buf }
 
           vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
-          vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
           vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
           vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
           vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)

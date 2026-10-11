@@ -16,6 +16,8 @@ return {
         "html",
         "python",
         "typescript",
+        "markdown",
+        "markdown_inline",
       },
     })
 
@@ -31,6 +33,7 @@ return {
         "html",
         "python",
         "typescript",
+        "markdown",
       },
       callback = function()
         vim.treesitter.start()
@@ -49,6 +52,7 @@ return {
         "html",
         "python",
         "typescript",
+        "markdown",
       },
       callback = function()
         vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
