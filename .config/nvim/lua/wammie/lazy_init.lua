@@ -21,7 +21,16 @@ require("lazy").setup({
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
       opts = {
-        colorscheme = "tokyonight-night",
+        colorscheme = "oxocarbon",
+      },
+    },
+    { "nyoom-engineering/oxocarbon.nvim", lazy = false, priority = 1000 },
+    { import = "lazyvim.plugins.extras.editor.snacks_picker" },
+    { import = "lazyvim.plugins.extras.util.octo" },
+    {
+      "pwntester/octo.nvim",
+      opts = {
+        default_to_projects_v2 = false,
       },
     },
     { "nvim-mini/mini.nvim", version = "*" },
