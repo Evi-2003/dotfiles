@@ -64,7 +64,7 @@ return {
         function()
           require("conform").format({
             async = true,
-            lsp_format = "fallback",
+            lsp_format = "never",
           })
         end,
         mode = "",
@@ -87,10 +87,8 @@ return {
 
         markdown = { "prettierd", "prettier", stop_after_first = true },
       },
-
-      format_on_save = {
-        timeout_ms = 502,
-        lsp_format = "fallback",
+      default_format_opts = {
+        lsp_format = "never",
       },
     },
   },

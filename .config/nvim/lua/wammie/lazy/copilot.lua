@@ -8,7 +8,7 @@ return {
         enabled = true,
         auto_trigger = true,
         keymap = {
-          accept = "<C-Space>",
+          accept = "<End>",
           next = "<M-]>",
           prev = "<M-[>",
           dismiss = "<C-]>",
@@ -23,15 +23,54 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     branch = "main",
+    cmd = {
+      "CopilotChat",
+      "CopilotChatToggle",
+      "CopilotChatExplain",
+      "CopilotChatFix",
+      "CopilotChatReview",
+      "CopilotChatTests",
+      "CopilotChatReset",
+      "CopilotChatPrompts",
+      "CopilotChatModels",
+    },
     dependencies = {
       "zbirenbaum/copilot.lua",
       "nvim-lua/plenary.nvim",
     },
     build = "make tiktoken",
     opts = {},
+    config = function(_, opts)
+      require("vim.treesitter.query").add_directive(
+        "set-lang-from-info-string!",
+        function(match, _, bufnr, predicate, metadata)
+          local language_node = match[predicate[2]]
+          if type(language_node) == "table" then
+            language_node = language_node[1]
+          end
+          if not language_node then
+            return
+          end
+
+          local info = vim.treesitter.get_node_text(language_node, bufnr):lower()
+          local filetype = vim.filetype.match({ filename = "file." .. info }) or info
+          metadata["injection.language"] = vim.treesitter.language.get_lang(filetype) or filetype
+        end,
+        { force = true }
+      )
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "copilot-chat",
+        callback = function(event)
+          vim.treesitter.start(event.buf, "markdown")
+        end,
+      })
+
+      require("CopilotChat").setup(opts)
+    end,
     keys = {
       {
-        "<leader>cc",
+        "<leader>aa",
         "<cmd>CopilotChatToggle<cr>",
         mode = { "n", "v" },
         desc = "Toggle Copilot Chat",

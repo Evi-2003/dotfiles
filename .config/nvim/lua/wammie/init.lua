@@ -1,16 +1,12 @@
 vim.g.mapleader = " "
 
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("lsp", { clear = true }),
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("format_on_save", { clear = true }),
   callback = function(args)
-    -- 2
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      -- 3
-      buffer = args.buf,
-      callback = function()
-        -- 4 + 5
-        vim.lsp.buf.format({ async = false, id = args.data.client_id })
-      end,
+    require("conform").format({
+      bufnr = args.buf,
+      async = false,
+      lsp_format = "never",
     })
   end,
 })
