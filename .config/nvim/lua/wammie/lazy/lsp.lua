@@ -2,7 +2,7 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = {
-      ensure_installed = { "lua_ls", "rust_analyzer", "ts_ls" },
+      ensure_installed = { "ts_ls", "eslint", "jsonls", "html", "cssls" },
     },
     dependencies = {
       { "mason-org/mason.nvim", opts = {} },
@@ -21,7 +21,6 @@ return {
       ensure_installed = {
         "prettierd",
         "prettier",
-        "stylua",
       },
     },
   },
@@ -36,60 +35,23 @@ return {
       "mason-org/mason-lspconfig.nvim",
     },
     opts = function(_, opts)
-    init = function()
-      -- Reserve a space in the gutter
-      -- This will avoid an annoying layout shift in the screen
-      vim.opt.signcolumn = "yes"
+      local enabled_servers = {
+        ts_ls = true,
+        eslint = true,
+        jsonls = true,
+        html = true,
+        cssls = true,
+      }
 
-      vim.diagnostic.config({
-        virtual_text = {
-          spacing = 2,
-          source = "if_many",
-        },
-        signs = true,
-        underline = true,
-        update_in_insert = false,
-        severity_sort = true,
-      })
-    end,
-    config = function()
-      local lsp_defaults = require("lspconfig").util.default_config
+      opts.servers = opts.servers or {}
+      local mappings = require("mason-lspconfig.mappings").get_mason_map()
+      for server in pairs(mappings.lspconfig_to_package) do
+        if not enabled_servers[server] then
+          opts.servers[server] = { enabled = false }
+        end
+      end
 
-      vim.lsp.config("lua_ls", {
-        root_markers = {
-          ".luarc.json",
-          ".luarc.jsonc",
-          ".git",
-        },
-      })
-
-      vim.lsp.enable("lua_ls")
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        desc = "LSP actions",
-        callback = function(event)
-          local opts = { buffer = event.buf }
-
-          vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
-          vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
-          vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-          vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-          vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
-          vim.keymap.set("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
-          vim.keymap.set("n", "<F4>", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-          vim.keymap.set({ "n", "x" }, "<F5>", "<cmd>lua vim.lsp.buf.format({async = true})<cr>", opts)
-          vim.keymap.set("n", "<F6>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-        end,
-      })
-
-      require("mason-lspconfig").setup({
-        ensure_installed = {},
-        handlers = {
-          function(server_name)
-            require("lspconfig")[server_name].setup({})
-          end,
-        },
-      })
+      return opts
     end,
   },
   {
@@ -111,8 +73,6 @@ return {
     },
     opts = {
       formatters_by_ft = {
-        lua = { "stylua" },
-
         javascript = { "prettierd", "prettier", stop_after_first = true },
         javascriptreact = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
@@ -126,8 +86,6 @@ return {
         html = { "prettierd", "prettier", stop_after_first = true },
 
         markdown = { "prettierd", "prettier", stop_after_first = true },
-
-        rust = { "rustfmt", lsp_format = "fallback" },
       },
 
       format_on_save = {
