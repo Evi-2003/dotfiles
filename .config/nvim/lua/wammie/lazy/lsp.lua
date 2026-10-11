@@ -36,20 +36,6 @@ return {
       "mason-org/mason-lspconfig.nvim",
     },
     opts = function(_, opts)
-      local keys = opts.servers["*"].keys or {}
-      opts.servers["*"].keys = vim.tbl_filter(function(key)
-        return key[1] ~= "gd"
-      end, keys)
-      table.insert(opts.servers["*"].keys, {
-        "gd",
-        function()
-          vim.lsp.buf.definition({ reuse_win = true })
-        end,
-        desc = "Go to definition",
-        has = "definition",
-      })
-      return opts
-    end,
     init = function()
       -- Reserve a space in the gutter
       -- This will avoid an annoying layout shift in the screen
