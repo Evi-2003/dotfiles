@@ -5,7 +5,7 @@ return {
   lazy = false,
 
   config = function()
-    require("nvim-treesitter").setup({
+    require("nvim-treesitter.configs").setup({
       ensure_installed = {
         "c",
         "lua",
@@ -20,6 +20,7 @@ return {
         "markdown",
         "markdown_inline",
       },
+      auto_install = true,
     })
 
     -- Enable treesitter highlighting
@@ -39,7 +40,7 @@ return {
         "markdown",
       },
       callback = function()
-        vim.treesitter.start()
+        pcall(vim.treesitter.start)
       end,
     })
 
